@@ -5,20 +5,34 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Weather Dashboard</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" />
 </head>
 
 <body>
-    <header>
-        <h1>Weather Dashboard</h1>
-        <p>Using the OpenWeatherMap API.</p> 
+    <header class="hero is-primary">
+      <div class="container">
+        <h1 class="title mt-6">Weather Dashboard</h1>
+        <p class="subtitle mb-6">Using the OpenWeatherMap API.</p> 
         <nav>
         </nav> 
+      </div>
     </header>
+<div class="container">
+    <main class="columns mt-6">
+      <div class="column is-one-quarter">
+      <form id="search" class="mt-2" >
+        <input id="query" class="input is-primary" type="text" placeholder="Primary input">
+        <button class="button is-primary mt-2">Submit</button>
+      </form>
+    </div>
+      <div class="column is-three-quarters">
+        <div class="box" id="results">
+          
+          </div>
+        </div>
 
-    <main>
     </main>
-
+  </div>
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="script.js"></script>
 </body>

@@ -7,6 +7,7 @@ let resultsBox = $('#results');
 
 async function sendRequest(event) {
     event.preventDefault();
+    resultsBox.empty();
     let searchRequest = $('#query').val();
     let encodeSearch = encodeURI(searchRequest).trim();
     let weatherQuery = weatherURL + encodeSearch + apiKey;
@@ -15,7 +16,9 @@ async function sendRequest(event) {
         return response.json();
     })
     .then (function(data) {
-        console.log(data);
+        let offset = new Date().getTimezoneOffset() * 60000;
+        let offsetCalc = data.timezone * 1000 + offset; 
+        let date = new Date(data.dt * 1000 + offsetCalc);
         let fahrenheit = Math.round((data.main.temp - 273.15) * (9/5) + 32);
         resultsBox.append(`
         <div class="columns is one-fifth">
@@ -24,12 +27,15 @@ async function sendRequest(event) {
                 <p class="card-header-title">${data.name}</p>
                 </div>
                 <div class="card-content">
-                <p></p>
+                <ul>
+                <li>${date.toLocaleDateString()}</li>
+                <li>${date.toLocaleTimeString()}</li>
+                <li>Temp: ${fahrenheit}°</li>
+                <li>Wind: ${data.wind.speed} MPH</li>
+                <li>Humidity: ${data.main.humidity}%</li>
+                </ul>
                 </div>
                 <div class="card-footer">
-                <p class="card-footer-item">${fahrenheit}°</p>
-                <p class="card-footer-item">Wind: ${data.wind.speed} MPH</p>
-                <p class="card-footer-item">Humidity: ${data.main.humidity}%</p>
                 </div>
             </div>
         </div>

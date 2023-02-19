@@ -11,31 +11,30 @@ async function sendRequest(event) {
     let searchRequest = $('#query').val();
     let encodeSearch = encodeURI(searchRequest).trim();
     let weatherQuery = weatherURL + encodeSearch + apiKey;
-    return fetch(weatherQuery, { method: 'GET' })
-    .then(function(response) {
-        return response.json();
-    })
+    let forecastQuery = forecastURL + encodeSearch + apiKey;
+    return Promise.all([
+        fetch(weatherQuery, { method: 'GET' }).then(response => response.json()),
+        fetch(forecastQuery, { method: 'GET' }).then(response => response.json())
+    ])
     .then (function(data) {
         let offset = new Date().getTimezoneOffset() * 60000;
-        let offsetCalc = data.timezone * 1000 + offset; 
-        let date = new Date(data.dt * 1000 + offsetCalc);
-        let fahrenheit = Math.round((data.main.temp - 273.15) * (9/5) + 32);
+        let offsetCalc = data[0].timezone * 1000 + offset; 
+        let date = new Date(data[0].dt * 1000 + offsetCalc);
+        let fahrenheit = Math.round((data[0].main.temp - 273.15) * (9/5) + 32);
         resultsBox.append(`
-        <div class="columns is one-fifth">
+        <div class="box">
             <div class="card">
-                <div class="card-header">
-                <p class="card-header-title">${data.name}</p>
+                <div class="card-header is-primary">
+                <p class="card-header-title">${data[0].name}</p>
                 </div>
                 <div class="card-content">
                 <ul>
                 <li>${date.toLocaleDateString()}</li>
                 <li>${date.toLocaleTimeString()}</li>
                 <li>Temp: ${fahrenheit}°</li>
-                <li>Wind: ${data.wind.speed} MPH</li>
-                <li>Humidity: ${data.main.humidity}%</li>
+                <li>Wind: ${data[0].wind.speed} MPH</li>
+                <li>Humidity: ${data[0].main.humidity}%</li>
                 </ul>
-                </div>
-                <div class="card-footer">
                 </div>
             </div>
         </div>

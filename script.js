@@ -26,7 +26,8 @@ async function sendRequest(event) {
         <div class="column is-full">
             <div class="box">
                 <h2 class="title">${data[0].name}</h2>
-                <p class="subtitle">Current</p>
+                <p class="subtitle">Current Conditions</p>
+                <img src="http://openweathermap.org/img/w/${data[0].weather[0].icon}.png" alt="${data[0].weather[0].main}">
                 <ul>
                     <li>${date1.toLocaleDateString()}</li>
                     <li>${date1.toLocaleTimeString()}</li>
@@ -58,6 +59,7 @@ async function sendRequest(event) {
                 <div class="column is-one-fifth">
                     <div class="box">
                         <p class="subtitle">${weekdays[i]}</p>
+                        <img src="http://openweathermap.org/img/w/${days[i].weather[0].icon}.png" alt="${days[i].weather[0].main}">
                         <div class="content">
                             <table>
                             <tr><td>${dates[i].toLocaleDateString()}</td></tr>

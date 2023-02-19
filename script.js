@@ -3,20 +3,40 @@ const weatherURL = "https://api.openweathermap.org/data/2.5/weather?q=";
 const forecastURL = "https://api.openweathermap.org/data/2.5/forecast?q=";
 
 let resultsBox = $('#results');
+let historyBox = $('#history');
+
+var searchHistory = [];
+
+// ADD VALIDATION
 
 async function sendRequest(event) {
     event.preventDefault();
     resultsBox.empty();
+    historyBox.empty();
     let searchRequest = $('#query').val();
     let encodeSearch = encodeURI(searchRequest).trim();
     let weatherQuery = weatherURL + encodeSearch + apiKey;
     let forecastQuery = forecastURL + encodeSearch + apiKey;
     return Promise.all([
-        fetch(weatherQuery, { method: 'GET' }).then(response => response.json()),
-        fetch(forecastQuery, { method: 'GET' }).then(response => response.json())
+        fetch(weatherQuery, { method: 'GET' }).then((response) => {
+            if (response.ok) {
+                return response.json();
+            } else { throw new Error('Something went wrong.')}}),
+        fetch(forecastQuery, { method: 'GET' }).then((response) => {
+            if (response.ok) {
+                return response.json();
+            } else { throw new Error('Something went wrong.') }})
     ])
     .then (function(data) {
-        console.log(data);
+        searchHistory.push(searchRequest);
+        for (let i=0; i < searchHistory.length; i++ ) {
+            historyBox.append(`
+                <tr><td><a id="${searchHistory[i]}">${searchHistory[i]}</a></tr></tr>
+            `);
+        };
+        localStorage.setItem('history', JSON.stringify(searchHistory));
+
+
         let offset = new Date().getTimezoneOffset() * 60000;
         var offsetCalc = data[0].timezone * 1000 + offset; 
         let date1 = new Date(data[0].dt * 1000 + offsetCalc);
@@ -44,7 +64,6 @@ async function sendRequest(event) {
         for (let i=0; i < data[1].list.length; i+=8) { // actual daily forecast is a pro feature - so this i+=8 iteration pulls one data point from each day
             days.push(data[1].list[i]); // pushes to a new array of the days for simplification
             fahrenheits.push(Math.round((data[1].list[i].main.temp - 273.15) * (9/5) + 32)); 
-            console.log(days); // for testing
         }
 
         let dates = [];
@@ -73,8 +92,19 @@ async function sendRequest(event) {
             `);
         };
         
-});
+    })       
+    .catch(function(error){
+        alert(`Error: ${error}`)
+        return;
+      });
 };
 
 
 $('#search').submit(sendRequest);
+
+$(document).ready(function() {
+    historyBox.click( function (event) {
+        console.log($(this).attr('id'));
+        $('#query').val();
+    });
+});

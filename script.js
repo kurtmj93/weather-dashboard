@@ -7,6 +7,15 @@ let historyBox = $('#history');
 
 var searchHistory = [];
 
+function prependHistory() {
+    for (let i=0; i < searchHistory.length; i++ ) {
+        // prepend adds to top
+    historyBox.prepend(`
+        <tr><td><a class="clicker" id="${searchHistory[i]}">${searchHistory[i]}</a></tr></tr>
+    `);
+    };
+};
+
 async function sendRequest(event) {
     event.preventDefault();
     resultsBox.empty();
@@ -31,13 +40,7 @@ async function sendRequest(event) {
             if (searchHistory.length > 10) {
                 searchHistory.shift(); // limits searchHistory to 10 items - shifts first answer out of array after tenth search
             }
-            for (let i=0; i < searchHistory.length; i++ ) {
-
-                // prepend adds to top
-            historyBox.prepend(`
-                <tr><td><a id="${searchHistory[i]}">${searchHistory[i]}</a></tr></tr>
-            `);
-            };
+            prependHistory();
             localStorage.setItem('history', JSON.stringify(searchHistory));
         };
 
@@ -113,8 +116,16 @@ async function sendRequest(event) {
 $('#search').submit(sendRequest);
 
 $(document).ready(function() {
-    historyBox.click( function (event) {
-        console.log($(this).attr('id'));
-        $('#query').val();
+
+    if (localStorage.getItem('history') !== null) {
+        searchHistory = JSON.parse(localStorage.getItem('history'));
+        prependHistory();
+    } else {
+        searchHistory = ['Richmond'];
+        prependHistory();
+    }
+    historyBox.on( 'click', '.clicker', function (event) {
+        $('#query').val($(this).attr('id'));
+        sendRequest(event);
     });
 });

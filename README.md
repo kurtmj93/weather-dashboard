@@ -1,77 +1,34 @@
-# weather-dashboard (Open Weather Map API)
+# Weather Dashboard (Open Weather Map API)
 
-## Deployed Link
+  ![License Badge](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)
 
-Coming soon.
+  ## Description
 
-## Screenshots
+  Showcases use of the Open Weather API, localStorage, the bulma framework and jQuery - allows user to search for weather conditions and a five-day forecast by city name.
 
-Coming soon. 
+  ## Table of Contents
 
-## Description
+  - [Usage](#usage)
+  - [Credits](#credits)
+  - [License](#license)
+  - [Questions](#questions)
 
-Submission for University of Richmond bootcamp Module 6 Challenge - Weather Dashboard using server-side API OpenWeatherMap.
+  ## Usage
 
-## User Story
+  Enter a city name in the form and press enter or the submit button, or click on one of the links in the search history to return current weather and a forecast.
 
-```md
-AS A traveler
-I WANT to see the weather outlook for multiple cities
-SO THAT I can plan a trip accordingly
-```
+  ![Application Screenshot](./assets/screenshot-weather.png)
 
-## Acceptance Criteria
+  ## Credits
 
-```md
-GIVEN a weather dashboard with form inputs
-WHEN I search for a city
-THEN I am presented with current and future conditions for that city and that city is added to the search history
-WHEN I view current weather conditions for that city
-THEN I am presented with the city name, the date, an icon representation of weather conditions, the temperature, the humidity, and the the wind speed
-WHEN I view future weather conditions for that city
-THEN I am presented with a 5-day forecast that displays the date, an icon representation of weather conditions, the temperature, the wind speed, and the humidity
-WHEN I click on a city in the search history
-THEN I am again presented with current and future conditions for that city
-``` 
+  Thank you to the OpenWeather API and Bulma framework!
 
-### Technical Acceptance Criteria: 40%
+  ## License
+    
+    This project is licensed under the MIT license.
 
-* Satisfies all of the above acceptance criteria plus the following:
+  ## Questions
 
-  * Uses the OpenWeather API to retrieve weather data
+  - [GitHub User: Kurtmj93](https://github.com/Kurtmj93/)
+  - Email: Kurtmj93@gmail.com
 
-  * Uses localStorage to store persistent data
-
-### Deployment: 32%
-
-* Application deployed at live URL
-
-* Application loads with no errors
-
-* Application GitHub URL submitted
-
-* GitHub repo contains application code
-
-### Application Quality: 15%
-
-* Application user experience is intuitive and easy to navigate
-
-* Application user interface style is clean and polished
-
-* Application resembles the mock-up functionality provided in the Challenge instructions
-
-### Repository Quality: 13%
-
-* Repository has a unique name
-
-* Repository follows best practices for file structure and naming conventions
-
-* Repository follows best practices for class/id naming conventions, indentation, quality comments, etc.
-
-* Repository contains multiple descriptive commit messages
-
-* Repository contains quality README file with description, screenshot, and link to deployed application
-
-## License
-
-See LICENSE in the repository.

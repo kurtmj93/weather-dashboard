@@ -7,12 +7,9 @@ let historyBox = $('#history');
 
 var searchHistory = [];
 
-// ADD VALIDATION
-
 async function sendRequest(event) {
     event.preventDefault();
     resultsBox.empty();
-    historyBox.empty();
     let searchRequest = $('#query').val();
     let encodeSearch = encodeURI(searchRequest).trim();
     let weatherQuery = weatherURL + encodeSearch + apiKey;
@@ -21,20 +18,28 @@ async function sendRequest(event) {
         fetch(weatherQuery, { method: 'GET' }).then((response) => {
             if (response.ok) {
                 return response.json();
-            } else { throw new Error('Something went wrong.')}}),
+            } else { throw new Error('Search was not a valid city name. Try again!')}}),
         fetch(forecastQuery, { method: 'GET' }).then((response) => {
             if (response.ok) {
                 return response.json();
-            } else { throw new Error('Something went wrong.') }})
+            } else { throw new Error('Search was not a valid city name. Try again!') }})
     ])
     .then (function(data) {
-        searchHistory.push(searchRequest);
-        for (let i=0; i < searchHistory.length; i++ ) {
-            historyBox.append(`
+        if (!searchHistory.includes(searchRequest)) {   // push only unique values to array
+            historyBox.empty();
+            searchHistory.push(searchRequest);
+            if (searchHistory.length > 10) {
+                searchHistory.shift(); // limits searchHistory to 10 items - shifts first answer out of array after tenth search
+            }
+            for (let i=0; i < searchHistory.length; i++ ) {
+
+                // prepend adds to top
+            historyBox.prepend(`
                 <tr><td><a id="${searchHistory[i]}">${searchHistory[i]}</a></tr></tr>
             `);
+            };
+            localStorage.setItem('history', JSON.stringify(searchHistory));
         };
-        localStorage.setItem('history', JSON.stringify(searchHistory));
 
 
         let offset = new Date().getTimezoneOffset() * 60000;
@@ -57,7 +62,7 @@ async function sendRequest(event) {
                 </ul>
             </div>
         </div>
-    `);
+        `);
 
         let fahrenheits = [];
         let days = [];
@@ -94,7 +99,12 @@ async function sendRequest(event) {
         
     })       
     .catch(function(error){
-        alert(`Error: ${error}`)
+        resultsBox.append(`
+            <div class="column is-full">
+            <div class="notification is-primary">
+                <button class="delete"></button>
+            ${error}
+            </div></div>`)
         return;
       });
 };

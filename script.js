@@ -1,11 +1,17 @@
+// API Key and query URLs
+
 const apiKey = '&APPID=365d89ed8b1f3231f3f36c6c09d489d6';
 const weatherURL = "https://api.openweathermap.org/data/2.5/weather?q=";
 const forecastURL = "https://api.openweathermap.org/data/2.5/forecast?q=";
+
+// jQuery grab boxes to append to - noted in html
 
 let resultsBox = $('#results');
 let historyBox = $('#history');
 
 var searchHistory = [];
+
+// function to be used in sendRequest as well as on page load
 
 function prependHistory() {
     for (let i=0; i < searchHistory.length; i++ ) {
@@ -16,6 +22,8 @@ function prependHistory() {
     };
 };
 
+// core async function for sending request, appending results
+
 async function sendRequest(event) {
     event.preventDefault();
     resultsBox.empty();
@@ -23,11 +31,14 @@ async function sendRequest(event) {
     let encodeSearch = encodeURI(searchRequest).trim();
     let weatherQuery = weatherURL + encodeSearch + apiKey;
     let forecastQuery = forecastURL + encodeSearch + apiKey;
+
+    // using Promise.all to send multiple API requests 
+
     return Promise.all([
         fetch(weatherQuery, { method: 'GET' }).then((response) => {
             if (response.ok) {
                 return response.json();
-            } else { throw new Error('Search was not a valid city name. Try again!')}}),
+            } else { throw new Error('Search was not a valid city name. Try again!')}}), // throw correctly prevents rest of function from executing if response is not OK
         fetch(forecastQuery, { method: 'GET' }).then((response) => {
             if (response.ok) {
                 return response.json();
@@ -35,20 +46,20 @@ async function sendRequest(event) {
     ])
     .then (function(data) {
         if (!searchHistory.includes(searchRequest)) {   // push only unique values to array
-            historyBox.empty();
+            historyBox.empty(); // empty box then loop through array
             searchHistory.push(searchRequest);
             if (searchHistory.length > 10) {
-                searchHistory.shift(); // limits searchHistory to 10 items - shifts first answer out of array after tenth search
+                searchHistory.shift(); // limits searchHistory to 10 items - shifts first answer out of array after tenth search. mostly an aesthetic choice
             }
             prependHistory();
-            localStorage.setItem('history', JSON.stringify(searchHistory));
+            localStorage.setItem('history', JSON.stringify(searchHistory)); // stores array in localStorage
         };
 
 
-        let offset = new Date().getTimezoneOffset() * 60000;
-        var offsetCalc = data[0].timezone * 1000 + offset; 
-        let date1 = new Date(data[0].dt * 1000 + offsetCalc);
-        let fahrenheit1 = Math.round((data[0].main.temp - 273.15) * (9/5) + 32);
+        let offset = new Date().getTimezoneOffset() * 60000; // getTimezoneOffset is in minutes, so * 60000 for ms
+        var offsetCalc = data[0].timezone * 1000 + offset;  // .timezone is in seconds, so * 1000 for ms
+        let date1 = new Date(data[0].dt * 1000 + offsetCalc); // this calc converts .dt to the appropriate local time.
+        let fahrenheit1 = Math.round((data[0].main.temp - 273.15) * (9/5) + 32); // main.temp is in kelvin, this converts to F
 
         resultsBox.append(`
         <div class="column is-full">
@@ -71,14 +82,14 @@ async function sendRequest(event) {
         let days = [];
         for (let i=0; i < data[1].list.length; i+=8) { // actual daily forecast is a pro feature - so this i+=8 iteration pulls one data point from each day
             days.push(data[1].list[i]); // pushes to a new array of the days for simplification
-            fahrenheits.push(Math.round((data[1].list[i].main.temp - 273.15) * (9/5) + 32)); 
+            fahrenheits.push(Math.round((data[1].list[i].main.temp - 273.15) * (9/5) + 32)); // pushes to a new array of temps for simplification
         }
 
         let dates = [];
         let weekdays = [];
         for (let i=0; i < days.length; i++ ) {
-            dates.push(new Date(days[i].dt * 1000 + offsetCalc));
-            weekdays.push(dates[i].toLocaleDateString('en-US', {weekday: 'long'}));
+            dates.push(new Date(days[i].dt * 1000 + offsetCalc)); // pushes to new array of dates for simplification
+            weekdays.push(dates[i].toLocaleDateString('en-US', {weekday: 'long'})); // pushes to new array of weekdays for simplification
         };
 
         for (let i=0; i < dates.length; i++ ) {
@@ -102,6 +113,7 @@ async function sendRequest(event) {
         
     })       
     .catch(function(error){
+        // this appends an error notifcation directly in the html rather than alerting via browser. uses bulma notifation class - looks nice.
         resultsBox.append(`
             <div class="column is-full">
             <div class="notification is-primary">
@@ -112,19 +124,22 @@ async function sendRequest(event) {
       });
 };
 
-
+// handles sending request via search form
 $('#search').submit(sendRequest);
+
+
+// $(document).ready function loads history from localStorage and holds click listeners for the history box, on document load
 
 $(document).ready(function() {
 
     if (localStorage.getItem('history') !== null) {
-        searchHistory = JSON.parse(localStorage.getItem('history'));
+        searchHistory = JSON.parse(localStorage.getItem('history')); // parses stringified stored data back into an array
         prependHistory();
     } else {
-        searchHistory = ['Richmond'];
+        searchHistory = ['Richmond']; // if there is no search history, this will append one item - 'Richmond' is an easter egg for the University of Richmond coding bootcamp :)
         prependHistory();
     }
-    historyBox.on( 'click', '.clicker', function (event) {
+    historyBox.on( 'click', '.clicker', function (event) { // .click vs .on was pulling the $(this) of the wrapper rather than the link clicked. appending the clicker class and '.clicker' parameter to the .on method fixed this issue
         $('#query').val($(this).attr('id'));
         sendRequest(event);
     });
